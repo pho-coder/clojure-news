@@ -5,7 +5,8 @@
             [compojure.route :as route]
             [clojure-news.env :refer [defaults]]
             [mount.core :as mount]
-            [clojure-news.middleware :as middleware]))
+            [clojure-news.middleware :as middleware]
+            [clojure-news.routes.clojure-news :refer [clojure-news-routes]]))
 
 (mount/defstate init-app
                 :start ((or (:init defaults) identity))
@@ -14,7 +15,9 @@
 (def app-routes
   (routes
     (-> #'home-routes
-        ;;    (wrap-routes middleware/wrap-csrf)
+        (wrap-routes middleware/wrap-csrf)
+        (wrap-routes middleware/wrap-formats))
+    (-> #'clojure-news-routes
         (wrap-routes middleware/wrap-formats))
     (route/not-found
       (:body
